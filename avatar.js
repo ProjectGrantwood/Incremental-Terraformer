@@ -29,7 +29,7 @@ class Avatar {
     move(xAmount, yAmount) {
         let movementConstrained = false;
         if (xAmount === 0 && yAmount === 0) {
-            this.grid.spawnEntities(this.x, this.y);
+            this.grid.spawnMaterials(this.x, this.y);
             this.grid.renderCellData(this.x, this.y, 'currentcell');
             this.grid.render(this.x, this.y);
             return this.render();
@@ -74,7 +74,7 @@ class Avatar {
         this.render();
         if (!movementConstrained) {
             this.grid.render(this.x - xAmount, this.y - yAmount);
-            this.grid.spawnEntities(this.x, this.y);
+            this.grid.spawnMaterials(this.x, this.y);
         }
         this.grid.renderCellData(this.x, this.y, 'currentcell')
     }
