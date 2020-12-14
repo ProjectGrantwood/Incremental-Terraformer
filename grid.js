@@ -6,7 +6,7 @@ class Grid {
         Grid.init(this);
     }
 
-    static init(aGrid) {
+    static init(aGrid, noiseJitter = 0.025) {
         let noiseSeed1 = Math.trunc(Math.random() * 9999999);
         let noiseSeed2 = Math.trunc(Math.random() * 9999999);
         if (noiseSeed1 === noiseSeed2) {
@@ -16,8 +16,12 @@ class Grid {
         for (let x = 0; x < aGrid.width; x++) {
             aGrid.cells[x] = [];
             for (let y = 0; y < aGrid.height; y++) {
-                let n1 = 0.5 - 0.025 + noise(x / 100, y / 100) * 0.025
-                let n = ((0.5 + n1) / 2 + (0.5 + n1) / 2 * Math.sin(Math.PI * 2 * noise(x / 100, y / 100, (noise(x / 200, y / 200)) * (aGrid.width / 200 + aGrid.height / 200) / 4)))
+                let n0 = x / 100;
+                let n1 = y / 100;
+                let n2 = noise(n0 / 2, y0 / 2) * (aGrid.width / 200 + aGrid.height / 200) / 4;
+                let jitteredNoise = 0.5 - noiseJitter + noise(n0, n1) * noiseJitter;
+                let smoothedNoiseWithJitter = (0.5 + jitteredNoise) / 2;
+                let n = smoothedNoiseWithJitter + smoothedNoiseWithJitter * fsin(noise(n0, n1, n2));
                 aGrid.cells[x][y] = {
                     displayData: {
                         color: lerpColor(color(aGrid.terrainlist[Math.floor(n * aGrid.terrainlist.length)].fillStyle), color(n * 255), 0.25)
@@ -41,8 +45,12 @@ class Grid {
         for (let x = 0; x < aGrid.width; x++) {
             for (let y = 0; y < aGrid.height; y++) {
                 let cell = aGrid.find(x, y);
-                let n = (1 - Math.abs(cell.physicalData.elevation - 50) / 50 + noise((x * 2 / aGrid.width), (y * 2 / aGrid.height))) / 2;
-                cell.physicalData.temperature = Math.round(((n * 100) * (aGrid.height - Math.abs(y - aGrid.height / 2)) / aGrid.height));
+                let n = noise(x * 2 / aGrid.width, y * 2 / aGrid.height);
+                let normedElevation = 1 - Math.abs(cell.physicalData.elevation - 50) / 50;
+                let normedLatitude = (aGrid.height - Math.abs(y - aGrid.height / 2)) / aGrid.height;
+                let interpolatedNoise = (normedElevation + n) / 2;
+                let normedTemperature = Math.round(interpolatedNoise * normedLatitude * 100);
+                cell.physicalData.temperature = normedTemperature;
                 cell.displayData.color = lerpColor(cell.displayData.color, color(n / 2 * 255, (green(cell.displayData.color) + (n * 255 * 2 / 3)) / 2, 255 - n * 4 / 3 * 255), 0.25);
             }
         }
@@ -138,83 +146,6 @@ class Grid {
         }
         let dataView = document.getElementById(id);
         dataView.innerHTML = c.physicalData.toRender + c.tileDescription + materialList;
-    }
-
-    getNeighborhood(type) {
-        let neighborhood;
-        switch (type) {
-            case 'von neumann':
-                neighborhood = [
-                    [0, 1],
-                    [0, -1],
-                    [-1, 0],
-                    [-1, 1]
-                ];
-                break;
-            case 'orthogonal':
-                neighborhood = [
-                    [-1, -1],
-                    [-1, 1],
-                    [1, -1],
-                    [1, 1]
-                ];
-                break;
-            case 'moore':
-                neighborhood = [
-                    [0, 1],
-                    [0, -1],
-                    [-1, 0],
-                    [-1, 1],
-                    [-1, -1],
-                    [-1, 1],
-                    [1, -1],
-                    [1, 1]
-                ];
-                break;
-            case 'von neumann extended':
-                neighborhood = [
-                    [0, 1],
-                    [0, -1],
-                    [-1, 0],
-                    [-1, 1],
-                    [-1, -1],
-                    [-1, 1],
-                    [1, -1],
-                    [1, 1],
-                    [0, -2],
-                    [2, 0],
-                    [0, 2],
-                    [-2, 0]
-                ];
-                break;
-            case 'circular':
-                neighborhood = [
-                    [0, 1],
-                    [0, -1],
-                    [-1, 0],
-                    [-1, 1],
-                    [-1, -1],
-                    [-1, 1],
-                    [1, -1],
-                    [1, 1],
-                    [0, -2],
-                    [2, 0],
-                    [0, 2],
-                    [-2, 0],
-                    [-1, -2],
-                    [1, -2],
-                    [2, -1],
-                    [2, 1],
-                    [1, 2],
-                    [-1, 2],
-                    [-2, 1],
-                    [-2, -1]
-                ]
-                break;
-            default:
-                neighborhood = this.getNeighborhood('moore');
-        }
-        return neighborhood;
     }
 
 }
