@@ -71,7 +71,7 @@ const getStatisticsObject = () => {
         return 2 * str * Math.ceil(lith / 2.5 + foc / 2.5);
     };
 
-    stats.genStats = function (totalPoints) {
+    stats.genStats = function(totalPoints) {
         let points = distr(totalPoints, stats.staticAttributes.length);
         for (let i = 0; i < 5; i++) {
             points.sort(randSwitch);
@@ -92,4 +92,6 @@ const getStatisticsObject = () => {
             stats.reCalcDynamicAttribute(attributeName);
         }
     }
+
+    return stats;
 }
