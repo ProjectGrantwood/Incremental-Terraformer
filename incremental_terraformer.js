@@ -37,7 +37,10 @@ function arrowKeyMovementHandler(e){
                 break;
             case 'ArrowDown': //down arrow key
                 eugene.move(0, 1);
-                break;						
+                break;	
+            case ' ': //space bar
+                eugene.move(0, 0);
+                break;
         }
         preventDefault();
     }

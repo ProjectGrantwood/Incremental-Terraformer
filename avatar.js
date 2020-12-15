@@ -5,7 +5,9 @@ class Avatar {
         this.grid = grid;
         this.fillStyle = 'orange';
         this.inventory = [];
-        this.stats = [];
+        this.stats = getStatisticsObject();
+        this.stats.genStats(18);
+        this.stats.calcAllDynamicAttributes();
     }
 
     blink() {

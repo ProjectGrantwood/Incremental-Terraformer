@@ -8,6 +8,28 @@ function floatToRad(floatVal){
     return Math.PI * 2 * floatVal;
 }
 
+function distr(val, amt) {
+	let valCopy = val;
+	let amtCopy = amt;
+	let ratio = valCopy/(amt)
+	if (ratio < 1) {
+		console.log('function distr() failed: argument "val" must be greater than or equal to argument "amt"')
+	} else {
+		let ret = [];
+		while (ret.length < amt-1) {
+			let toAdd = Math.floor(Math.floor(Math.random() * ratio)+ratio/2);
+			valCopy -= toAdd;
+			ret.push(toAdd)
+			amtCopy--;
+			ratio = valCopy / amtCopy;
+		}
+		if (valCopy > 0) {
+			ret.push(valCopy)
+		}
+		return ret;
+	}
+}
+
 // using the function above to modify the basic trig functions in vanilla javascript.
 
 function fsin(val){
@@ -20,6 +42,12 @@ function fcos(val){
 
 function ftan(val){
     return Math.tan(floatToRad(val));
+}
+
+function randSwitch(a, b){
+    if (a || b){
+        return [-1, 0, 1][Math.floor(Math.random() * 3)];
+    }
 }
 
 //Mostly for use with grids. Function returns an array of offsets that can be used to locate the neighbors of a cell in a 2D matrix.

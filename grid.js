@@ -18,7 +18,7 @@ class Grid {
             for (let y = 0; y < aGrid.height; y++) {
                 let n0 = x / 100;
                 let n1 = y / 100;
-                let n2 = noise(n0 / 2, y0 / 2) * (aGrid.width / 200 + aGrid.height / 200) / 4;
+                let n2 = noise(n0 / 2, n1 / 2) * (aGrid.width / 200 + aGrid.height / 200) / 4;
                 let jitteredNoise = 0.5 - noiseJitter + noise(n0, n1) * noiseJitter;
                 let smoothedNoiseWithJitter = (0.5 + jitteredNoise) / 2;
                 let n = smoothedNoiseWithJitter + smoothedNoiseWithJitter * fsin(noise(n0, n1, n2));
