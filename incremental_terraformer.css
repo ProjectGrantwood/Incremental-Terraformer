@@ -10,11 +10,16 @@ body {
 
 #appcontainer {
     display: grid;
-    grid-template-rows: repeat(60px 10);
+    grid-template-rows: 1fr auto;
     grid-template-columns: 1fr auto 1fr;
-    grid-template-areas: "a main b"
-                         "c main b";
+    grid-template-areas: "info1 main info2"
+                         "info3 main info2";
     gap: 4px;
+}
+
+.info {
+    margin: 0px;
+    padding: 16px;
 }
 
 #defaultCanvas0 {
@@ -23,17 +28,17 @@ body {
     grid-area: main;
 }
 
-#a {
+#info1 {
     background-color: green;
-    grid-area: a;
+    grid-area: info2;
 }
 
 #currentcell {
     background-color: #03875b;
-    grid-area: c;
+    grid-area: info1;
 }
 
-#b {
+#info2 {
     background-color: blue;
-    grid-area: b;
+    grid-area: info3;
 }

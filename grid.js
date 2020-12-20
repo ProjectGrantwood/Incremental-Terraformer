@@ -24,7 +24,7 @@ class Grid {
                 let n = smoothedNoiseWithJitter + smoothedNoiseWithJitter * fsin(noise(n0, n1, n2));
                 aGrid.cells[x][y] = {
                     displayData: {
-                        color: lerpColor(color(aGrid.terrainlist[Math.floor(n * aGrid.terrainlist.length)].fillStyle), color(n * 255), 0.25)
+                        color: lerpColor(color(aGrid.terrainlist[clamp(Math.floor(n * aGrid.terrainlist.length), 0, aGrid.terrainlist.length)].fillStyle), color(n * 255), 0.25)
                     },
                     physicalData: {
                         elevation: Math.round(n * 100),
@@ -57,8 +57,8 @@ class Grid {
         for (let x = 0; x < aGrid.width; x++) {
             for (let y = 0; y < aGrid.height; y++) {
                 let cell = aGrid.find(x, y);
-                cell.physicalData.toRender = 'Location: (' + x + ', ' + y + ')<br>Elevation: ' + cell.physicalData.elevation + '<br>Terrain: ' + cell.physicalData.terrainType.id + '<br>Temperature: ' + cell.physicalData.temperature;
-                cell.tileDescription = '<br>' + cell.physicalData.terrainType.defaultDescription + '.';
+                cell.physicalData.toRender = 'Current Coordinate Data:<br><br>Location: (' + x + ', ' + y + ')<br>Elevation: ' + cell.physicalData.elevation + '<br>Temperature: ' + cell.physicalData.temperature;
+                cell.tileDescription = cell.physicalData.terrainType.defaultDescription + '.';
             }
         }
     }
@@ -135,17 +135,21 @@ class Grid {
         };
     }
 
-    renderCellData(x, y, id) {
+    renderCellData(x, y, id, playerName = 'The player') {
         let c = this.find(x, y);
         let materialList = '<br>';
         if (c.materialData.materialsSpawned === true) {
-            materialList += 'Available to harvest here: ';
+            materialList += 'Available to harvest here:';
             for (let e of Object.getOwnPropertyNames(c.materialData.materials)) {
-                materialList += '<br>' + c.materialData.materials[e].id + ': ' + c.materialData.materials[e].amount;
+                let materialString = c.materialData.materials[e].id;
+                if (materialString.endsWith('water')){
+                    materialString = materialString.replace(/water/, ' water');
+                }
+                materialList += '<br>' + firstWord(materialString) + ': ' + c.materialData.materials[e].amount;
             }
         }
         let dataView = document.getElementById(id);
-        dataView.innerHTML = c.physicalData.toRender + c.tileDescription + materialList;
+        dataView.innerHTML = c.physicalData.toRender + '<br><br>' + playerName + c.tileDescription + '<br>' + materialList;
     }
 
 }

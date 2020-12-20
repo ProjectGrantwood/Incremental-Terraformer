@@ -2,13 +2,17 @@ function firstWord(aString) {
     return aString.charAt(0).toUpperCase() + aString.slice(1);
 }
 
+function clamp(val, lo, hi){
+    return val < lo ? lo : (val > hi ? hi : val)
+}
+
 /*  convert a float to radians. Ideal for values between -1 and 1. */
 
 function floatToRad(floatVal){
     return Math.PI * 2 * floatVal;
 }
 
-function distr(val, amt) {
+function distr(val, amt, iterations = 5) {
 	let valCopy = val;
 	let amtCopy = amt;
 	let ratio = valCopy/(amt)
@@ -25,7 +29,15 @@ function distr(val, amt) {
 		}
 		if (valCopy > 0) {
 			ret.push(valCopy)
-		}
+        }
+        for (let i = 0; i < iterations; i++){
+            let hi = Math.max(...ret);
+            let lo = Math.min(...ret);
+            if (hi - 1 > 0){
+                hi -= 1;
+                lo += 1;
+            }
+        }
 		return ret;
 	}
 }
@@ -45,8 +57,10 @@ function ftan(val){
 }
 
 function randSwitch(a, b){
-    if (a || b){
-        return [-1, 0, 1][Math.floor(Math.random() * 3)];
+    if (a!==b){
+        return [-1, 1][Math.floor(Math.random() * 2)];
+    } else {
+        return 0;
     }
 }
 
