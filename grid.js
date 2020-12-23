@@ -152,4 +152,8 @@ class Grid {
         dataView.innerHTML = c.physicalData.toRender + '<br><br>' + playerName + c.tileDescription + '<br>' + materialList;
     }
 
+    renderCellButtons(x, y, id, playerName = 'The player'){
+        let c = this.find(x, y);
+    }
+
 }

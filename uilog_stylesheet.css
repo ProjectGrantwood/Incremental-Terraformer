@@ -1,0 +1,21 @@
+#uilog {
+    background-color: rgb(0, 32, 32);
+    border-radius: 3px;
+    padding: 0.5em;
+}
+
+.uilogwarning {
+    color: #c8c820;
+}
+
+.uiloginfo {
+    color: #3838ff;
+}
+
+.uilogupgrade {
+    color: #00ff70;
+}
+
+.uilogtimestamp {
+    color: #abcdef;
+}

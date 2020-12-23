@@ -62,7 +62,7 @@ class Avatar {
             case 'attack' :
                 this.dynamicAttributes[atr].total = Math.ceil(str / 2 + lith / 4 + foc / 4);
                 break;
-            case 'carryWeight' :
+            case 'carryweight' :
                 this.dynamicAttributes[atr].total = 2 * str * Math.ceil(lith / 2.5 + foc / 2.5);
                 break;
         }
@@ -86,6 +86,27 @@ class Avatar {
         }
     }
 
+    pickUp(item){
+        if (this.dynamicAttributes.carryweight.val + item.unitmass <= this.dynamicAttributes.carryweight.total) {
+            return;
+        } else {
+            this.inventory.push(item);
+            this.calcCarriedWeight();
+        }
+    }
+
+    calcCarriedWeight(){
+        if (this.inventory.length > 0) {
+            this.dynamicAttributes.carryweight.val = 0;
+        } else {
+            let sum = 0;
+            for (let i = 0; i < this.inventory.length; i++){
+                sum += this.inventory[i].unitmass;
+            }
+            this.dynamicAttributes.carryweight.val = sum;
+        }
+    }
+
     blink() {
         if (frameCount % 24 === 0) {
             if (this.fillStyle === 'orange') {
@@ -102,7 +123,7 @@ class Avatar {
         let y = this.grid.size * this.y + this.grid.size / 2;
         fill(this.fillStyle)
         ellipse(x, y, this.grid.size);
-        this.renderStatsData('info1');
+        this.renderStatsData('playerdata');
     }
 
     move(xAmount, yAmount) {
