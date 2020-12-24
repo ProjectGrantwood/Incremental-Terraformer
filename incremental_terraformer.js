@@ -2,7 +2,7 @@ let world;
 let eugene;
 let cellSize = 8;
 let w = screen.width * 3 / 4;
-let h = 840;
+let h = screen.height * 2 / 3;
 
 function setup(){
     createCanvas(w, h);
@@ -17,6 +17,7 @@ function setup(){
     document.addEventListener('keydown', arrowKeyMovementHandler);
     world.updateAll();
     eugene.spawn();
+    uilog.warn(`Greetings, ${eugene.name}. You're a castaway. Such is your luck.`)
 }
 
 function draw(){

@@ -10,10 +10,11 @@ body {
 
 #appcontainer {
     display: grid;
-    grid-template-rows: 1fr auto;
+    grid-template-rows: 1fr auto auto;
     grid-template-columns: 1fr auto 1fr;
     grid-template-areas: "celldata main playerdata"
-                         "buttons  main playerdata";
+                         "buttons  main playerdata"
+                         "log      log  log       ";
     gap: 4px;
 }
 
@@ -41,4 +42,9 @@ body {
 #buttons {
     background-color: blue;
     grid-area: buttons;
+}
+
+#uilog {
+    background-color: black;
+    grid-area: log;
 }
