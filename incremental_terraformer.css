@@ -12,9 +12,9 @@ body {
     display: grid;
     grid-template-rows: 1fr auto auto;
     grid-template-columns: 1fr auto 1fr;
-    grid-template-areas: "celldata main playerdata"
-                         "buttons  main playerdata"
-                         "log      log  log       ";
+    grid-template-areas: "c1 m1 p1"
+                         "c2 m1 p2"
+                         "l1 l1 l1";
     gap: 4px;
 }
 
@@ -26,25 +26,30 @@ body {
 #defaultCanvas0 {
     margin: 0px;
     padding: 0px;
-    grid-area: main;
+    grid-area: m1;
 }
 
 #currentcell {
     background-color: #03875b;
-    grid-area: celldata;
+    grid-area: c1;
 }
 
 #playerdata {
-    background-color: green;
-    grid-area: playerdata;
+    background-color: #5587b1;
+    grid-area: p1;
 }
 
-#buttons {
-    background-color: blue;
-    grid-area: buttons;
+#cellbuttons {
+    background-color: #0387b1;
+    grid-area: c2;
+}
+
+#playerbuttons {
+    background-color: #746374;
+    grid-area: p2;
 }
 
 #uilog {
     background-color: black;
-    grid-area: log;
+    grid-area: l1;
 }

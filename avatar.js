@@ -1,6 +1,7 @@
 class Avatar {
-    constructor(avatarName, x, y, grid) {
+    constructor(avatarName, x, y, grid, avatarId = avatarName) {
         this.name = avatarName;
+        this.id = avatarId;
         this.x = x;
         this.y = y;
         this.grid = grid;
@@ -52,21 +53,26 @@ class Avatar {
         switch(atr){
             case 'health' :
                 this.dynamicAttributes[atr].total = 4 + Math.floor(lith / 3) + Math.ceil(str + str * str / 4);
+                this.dynamicAttributes[atr].val = this.dynamicAttributes[atr].total
                 break;
             case 'energy' :
                 this.dynamicAttributes[atr].total = Math.ceil((str + lith * 2) * lith);
+                this.dynamicAttributes[atr].val = this.dynamicAttributes[atr].total
                 break;
             case 'knowledge' :
                 this.dynamicAttributes[atr].total = Math.ceil(mem * (rec + foc) / 2);
+                this.dynamicAttributes[atr].val = this.dynamicAttributes[atr].total
                 break;
             case 'attack' :
                 this.dynamicAttributes[atr].total = Math.ceil(str / 2 + lith / 4 + foc / 4);
+                this.dynamicAttributes[atr].val = this.dynamicAttributes[atr].total
                 break;
             case 'carryweight' :
                 this.dynamicAttributes[atr].total = 2 * str * Math.ceil(lith / 2.5 + foc / 2.5);
+                this.dynamicAttributes[atr].val = 0;
                 break;
         }
-        this.dynamicAttributes[atr].val = this.dynamicAttributes[atr].total;
+        ;
     }
 
     static genStats(total, anAvatar) {
@@ -86,17 +92,25 @@ class Avatar {
         }
     }
 
-    pickUp(item){
-        if (this.dynamicAttributes.carryweight.val + item.unitmass <= this.dynamicAttributes.carryweight.total) {
-            return;
+    pickUp(itemId){
+        let c = this.grid.find(this.x, this.y);
+        let item = c.materialData.materials[itemId];
+        if (this.dynamicAttributes.carryweight.val + item.unitmass > this.dynamicAttributes.carryweight.total) {
+            uilog.warn('You cannot pick up this item: you are carrying too much!')
         } else {
-            this.inventory.push(item);
+            this.inventory.push(Object.create(item));
             this.calcCarriedWeight();
+            this.grid.decrementMaterialAmount(c, itemId);
+            if (JSON.stringify(c.materialData.materials) === '{}'){
+                c.materialData.materialsSpawned = false;
+            }
+            this.grid.renderCellData(this.x, this.y, 'currentcell', this.name)
+            this.grid.renderCellButtons(this.x, this.y, this);
         }
     }
 
     calcCarriedWeight(){
-        if (this.inventory.length > 0) {
+        if (this.inventory.length === 0) {
             this.dynamicAttributes.carryweight.val = 0;
         } else {
             let sum = 0;
@@ -132,6 +146,7 @@ class Avatar {
             this.grid.spawnMaterials(this.x, this.y);
             this.grid.renderCellData(this.x, this.y, 'currentcell', this.name);
             this.grid.render(this.x, this.y);
+            this.grid.renderCellButtons(this.x, this.y, this);
             return this.render();
         }
         let x = this.x + xAmount;
@@ -175,8 +190,10 @@ class Avatar {
         if (!movementConstrained) {
             this.grid.render(this.x - xAmount, this.y - yAmount);
             this.grid.spawnMaterials(this.x, this.y);
+            this.grid.renderCellButtons(this.x, this.y, this);
         }
         this.grid.renderCellData(this.x, this.y, 'currentcell', this.name)
+        this.grid.renderCellButtons(this.x, this.y, this);
     }
 
     renderStatsData(id) {
@@ -190,8 +207,12 @@ class Avatar {
         for (let i = 0; i < dynamicAtr.length; i++){
             dynamicString += (firstWord(dynamicAtr[i]).match('Carryweight') ? 'Carry Weight' : firstWord(dynamicAtr[i])) + ': ' + this.dynamicAttributes[dynamicAtr[i]].val + ' / ' + this.dynamicAttributes[dynamicAtr[i]].total + '<br>';
         }
+        let inventoryString = `<br>${this.name}'s Inventory:`;
+        for (let i = 0; i < this.inventory.length; i++){
+            inventoryString += `<br>${this.inventory[i].id}`;
+        }
         let dataView = document.getElementById(id);
-        dataView.innerHTML = `${this.name}'s attributes:<br><br>${staticString}<br>${dynamicString}`;
+        dataView.innerHTML = `${this.name}'s attributes:<br><br>${staticString}<br>${dynamicString}${inventoryString}`;
     }
 
 }

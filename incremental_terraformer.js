@@ -1,6 +1,6 @@
 let world;
 let eugene;
-let cellSize = 8;
+let cellSize = 6;
 let w = screen.width * 3 / 4;
 let h = screen.height * 2 / 3;
 
@@ -13,7 +13,7 @@ function setup(){
     noStroke();
     noiseDetail(10, 0.575)
     world = new Grid(Math.floor(w / cellSize), Math.floor(h /cellSize), cellSize, getTerrains());
-    eugene = new Avatar('Eugene', 5, 5, world);
+    eugene = new Avatar('Eugene', 5, 5, world, 'eugene');
     document.addEventListener('keydown', arrowKeyMovementHandler);
     world.updateAll();
     eugene.spawn();

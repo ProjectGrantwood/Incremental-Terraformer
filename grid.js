@@ -6,7 +6,7 @@ class Grid {
         Grid.init(this);
     }
 
-    static init(aGrid, noiseJitter = 0.025) {
+    static init(aGrid, noiseJitter = 0.075) {
         let noiseSeed1 = Math.trunc(Math.random() * 9999999);
         let noiseSeed2 = Math.trunc(Math.random() * 9999999);
         if (noiseSeed1 === noiseSeed2) {
@@ -19,16 +19,16 @@ class Grid {
                 let n0 = x / 100;
                 let n1 = y / 100;
                 let n2 = noise(n0 / 2, n1 / 2) * (aGrid.width / 200 + aGrid.height / 200) / 4;
-                let jitteredNoise = 0.5 - noiseJitter + noise(n0, n1) * noiseJitter;
+                let jitteredNoise = 0.5 - noiseJitter + noise(n0, n1, Math.random()) * noiseJitter;
                 let smoothedNoiseWithJitter = (0.5 + jitteredNoise) / 2;
-                let n = smoothedNoiseWithJitter + smoothedNoiseWithJitter * fsin(noise(n0, n1, n2));
+                let n = smoothedNoiseWithJitter + smoothedNoiseWithJitter * fsin(noise(n0, n1, n2) ** (n2 * 4));
                 aGrid.cells[x][y] = {
                     displayData: {
-                        color: lerpColor(color(aGrid.terrainlist[clamp(Math.floor(n * aGrid.terrainlist.length), 0, aGrid.terrainlist.length)].fillStyle), color(n * 255), 0.25)
+                        color: lerpColor(color(aGrid.terrainlist[clamp(Math.floor(Math.abs(n) * aGrid.terrainlist.length), 0, aGrid.terrainlist.length)].fillStyle), color(n * 255), 0.25)
                     },
                     physicalData: {
-                        elevation: Math.round(n * 100),
-                        terrainType: aGrid.terrainlist[Math.floor(n * aGrid.terrainlist.length)],
+                        elevation: Math.round(Math.abs(n) * 100),
+                        terrainType: aGrid.terrainlist[Math.floor(Math.abs(n) * aGrid.terrainlist.length)],
                     },
                     materialData: {
                         materialsSpawned: false,
@@ -124,13 +124,16 @@ class Grid {
     decrementMaterialAmount(c, id) {
         if (c.materialData.materials[id].amount > 1) {
             c.materialData.materials[id].amount -= 1;
+        } else {
+            delete c.materialData.materials[id];
         }
     }
 
-    addMaterialToCell(c, id) {
+    addMaterialToCell(c, id, materialList = materials) {
         c.materialData.materialsSpawned = true;
         c.materialData.materials[id] = {
             id: id,
+            unitmass: materials[id].unitmass,
             amount: 1
         };
     }
@@ -140,20 +143,39 @@ class Grid {
         let materialList = '<br>';
         if (c.materialData.materialsSpawned === true) {
             materialList += 'Available to harvest here:';
-            for (let e of Object.getOwnPropertyNames(c.materialData.materials)) {
-                let materialString = c.materialData.materials[e].id;
-                if (materialString.endsWith('water')){
+            for (let m of Object.getOwnPropertyNames(c.materialData.materials)) {
+                let materialString = c.materialData.materials[m].id;
+                if (materialString.endsWith('water')) {
                     materialString = materialString.replace(/water/, ' water');
                 }
-                materialList += '<br>' + firstWord(materialString) + ': ' + c.materialData.materials[e].amount;
+                materialList += '<br>' + firstWord(materialString) + ': ' + c.materialData.materials[m].amount;
             }
         }
         let dataView = document.getElementById(id);
         dataView.innerHTML = c.physicalData.toRender + '<br><br>' + playerName + c.tileDescription + '<br>' + materialList;
     }
 
-    renderCellButtons(x, y, id, playerName = 'The player'){
-        let c = this.find(x, y);
+    renderCellButtons(x, y, avatar) {
+            let c = this.find(x, y);
+            let buttons = document.getElementById('cellbuttons');
+            buttons.innerHTML = '';
+            let selectMaterialString = '';
+            if (c.materialData.materialsSpawned === true) {
+                selectMaterialString += `<select name="toHarvest" id="toHarvest">Harvest Material:`
+                for (let m of Object.getOwnPropertyNames(c.materialData.materials)) {
+                    let mString = c.materialData.materials[m].id;
+                    // if (mString.endsWith('water')) {
+                        // mString = mString.replace(/water/, ' water');
+                    // }
+                    selectMaterialString += `<option value=${mString}>${mString}</option>`
+                }
+                selectMaterialString += `</select>`;
+                buttons.innerHTML += selectMaterialString;
+                let materialSelect = document.getElementById('toHarvest');
+                let buttonString = `<button onclick="eugene.pickUp('${materialSelect.value}')">Harvest Material</button>`;
+                buttons.innerHTML += buttonString;
+                
+        }
     }
 
 }
