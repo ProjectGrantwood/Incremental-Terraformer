@@ -197,3 +197,7 @@ function laplace(cells, x, y, propertyAccessor) {
 
     return Math.floor((s + 10) / 20);
 }
+
+function getObjectProperty(object, index){
+    return Object.getOwnPropertyNames(object)[index];
+}

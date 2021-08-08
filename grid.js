@@ -133,7 +133,7 @@ class Grid {
         c.materialData.materialsSpawned = true;
         c.materialData.materials[id] = {
             id: id,
-            unitmass: materials[id].unitmass,
+            unitmass: materialList[id].unitmass,
             amount: 1
         };
     }
@@ -172,7 +172,8 @@ class Grid {
                 selectMaterialString += `</select>`;
                 buttons.innerHTML += selectMaterialString;
                 let materialSelect = document.getElementById('toHarvest');
-                let buttonString = `<button onclick="eugene.pickUp('${materialSelect.value}')">Harvest Material</button>`;
+                
+                let buttonString = `<button onclick="eugene.pickUp('${materialSelect.value}')">Harvest ${materialSelect.value}</button>`;
                 buttons.innerHTML += buttonString;
                 
         }
