@@ -1,8 +1,12 @@
 let world;
 let eugene;
-let cellSize = 6;
-let w = screen.width * 3 / 4;
-let h = screen.height * 2 / 3;
+let zoomLayer;
+let cellSize = 4;
+let zoomRadius = 6;
+let zoomedCellSize = 6 * zoomRadius
+let w = 600;
+let h = 600;
+
 
 function setup(){
     createCanvas(w, h);
@@ -13,15 +17,23 @@ function setup(){
     noStroke();
     noiseDetail(10, 0.575)
     world = new Grid(Math.floor(w / cellSize), Math.floor(h /cellSize), cellSize, getTerrains());
-    eugene = new Avatar('Eugene', 5, 5, world, 'eugene');
+    eugene = new Avatar('Eugene', cellSize - 1, cellSize - 1, world, 'eugene');
     document.addEventListener('keydown', arrowKeyMovementHandler);
+    let zoomDisplayElement = document.getElementById("zoomlayer");
+    let zoomedElementSideLength = zoomedCellSize * (zoomRadius + 1)
+    container.appendChild(zoomDisplayElement);
+    zoomLayer = createGraphics(zoomedElementSideLength, zoomedElementSideLength, zoomDisplayElement)
+    zoomDisplayElement.setAttribute("style", `display: flex; width: ${zoomedElementSideLength}; height: ${zoomedElementSideLength}; grid-area: zl;`)
     world.updateAll();
     eugene.spawn();
-    uilog.warn(`Greetings, ${eugene.name}. You're a castaway. Such is your luck.`)
+    UILOG.warn(`Greetings, ${eugene.name}. You're a castaway. Such is your luck.`)
 }
 
 function draw(){
+    world.renderSubsection(zoomLayer, eugene.x, eugene.y);
     eugene.blink();
+    zoomLayer.fill("purple");
+    zoomLayer.ellipse(zoomedCellSize * (zoomRadius / 2 + 0.5), zoomedCellSize * (zoomRadius / 2 + 0.5), 25);
 }
 
 function arrowKeyMovementHandler(e){
@@ -41,6 +53,7 @@ function arrowKeyMovementHandler(e){
                 break;	
             case ' ': //space bar
                 eugene.move(0, 0);
+                UILOG.inform("Eugene waits for a tick.");
                 break;
         }
         preventDefault();

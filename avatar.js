@@ -5,6 +5,7 @@ class Avatar {
         this.x = x;
         this.y = y;
         this.grid = grid;
+        this.size = this.grid.size - 1;
         this.fillStyle = 'orange';
         this.inventory = [];
         this.staticAttributes = {
@@ -44,19 +45,18 @@ class Avatar {
 
     calcBase(atr){
         let statAtr = Object.getOwnPropertyNames(this.staticAttributes);
-        let str = this.staticAttributes[statAtr[0]];
-        let lith = this.staticAttributes[statAtr[1]]
-        let rec = this.staticAttributes[statAtr[2]];
-        let foc = this.staticAttributes[statAtr[3]];
-        let mem = this.staticAttributes[statAtr[4]];
-        let retVal = 0;
+        let str = parseInt(this.staticAttributes[statAtr[0]]);
+        let lith = parseInt(this.staticAttributes[statAtr[1]]);
+        let rec = parseInt(this.staticAttributes[statAtr[2]]);
+        let foc = parseInt(this.staticAttributes[statAtr[3]]);
+        let mem = parseInt(this.staticAttributes[statAtr[4]]);
         switch(atr){
             case 'health' :
-                this.dynamicAttributes[atr].total = 4 + Math.floor(lith / 3) + Math.ceil(str + str * str / 4);
+                this.dynamicAttributes[atr].total = 4 + lith * str;
                 this.dynamicAttributes[atr].val = this.dynamicAttributes[atr].total
                 break;
             case 'energy' :
-                this.dynamicAttributes[atr].total = Math.ceil((str + lith * 2) * lith);
+                this.dynamicAttributes[atr].total = Math.floor(4 + lith * str + lith * (lith + foc) / 2);
                 this.dynamicAttributes[atr].val = this.dynamicAttributes[atr].total
                 break;
             case 'knowledge' :
@@ -68,7 +68,7 @@ class Avatar {
                 this.dynamicAttributes[atr].val = this.dynamicAttributes[atr].total
                 break;
             case 'carryweight' :
-                this.dynamicAttributes[atr].total = 2 * str * Math.ceil(lith / 2.5 + foc / 2.5);
+                this.dynamicAttributes[atr].total = 4 + 2 * str * Math.ceil(lith / 2.5 + foc / 2.5);
                 this.dynamicAttributes[atr].val = 0;
                 break;
         }
@@ -114,8 +114,8 @@ class Avatar {
             this.dynamicAttributes.carryweight.val = 0;
         } else {
             let sum = 0;
-            for (let i = 0; i < this.inventory.length; i++){
-                sum += this.inventory[i].unitmass;
+            for (let i of this.inventory){
+                sum += i.unitmass;
             }
             this.dynamicAttributes.carryweight.val = sum;
         }
@@ -135,13 +135,31 @@ class Avatar {
     render() {
         let x = this.grid.size * this.x + this.grid.size / 2;
         let y = this.grid.size * this.y + this.grid.size / 2;
-        fill(this.fillStyle)
-        ellipse(x, y, this.grid.size);
+        fill(this.fillStyle);
+        ellipse(x, y, this.size);
         this.renderStatsData('playerdata');
+    }
+    
+    handleBoundaryCollision(xAmount, yAmount) {
+        let movementConstrained = false;
+        let x = this.x + xAmount;
+        let y = this.y + yAmount;
+        if (this.grid.wrapping){
+            x = wrap(x, 0, this.grid.width);
+            y = wrap(y, 0, this.grid.height);
+        } else {
+            if (this.x < 0 || this.y < 0 || this.x >= this.grid.width || this.y >= this.grid.height) {
+                movementConstrained = true;
+            }
+            x = clamp(x, 0, this.grid.width - 1);
+            y = clamp(y, 0, this.grid.height - 1);
+        }
+        this.x = x;
+        this.y = y;
+        return movementConstrained;
     }
 
     move(xAmount, yAmount) {
-        let movementConstrained = false;
         if (xAmount === 0 && yAmount === 0) {
             this.grid.spawnMaterials(this.x, this.y);
             this.grid.renderCellData(this.x, this.y, 'currentcell', this.name);
@@ -149,43 +167,7 @@ class Avatar {
             this.grid.renderCellButtons(this.x, this.y, this);
             return this.render();
         }
-        let x = this.x + xAmount;
-        let y = this.y + yAmount;
-        if (this.x < 0) {
-            if (this.grid.wrapping) {
-                x += this.grid.width;
-            } else {
-                x = 0;
-                movementConstrained = true;
-            }
-        }
-        if (this.y < 0) {
-            if (this.grid.wrapping) {
-                y += this.grid.height;
-            } else {
-                y = 0;
-                movementConstrained = true;
-            }
-        }
-        if (x >= this.grid.width) {
-            if (this.grid.wrapping) {
-                x -= this.grid.width;
-            } else {
-                x = this.grid.width - 1;
-                movementConstrained = true;
-            }
-        }
-        if (y >= this.grid.height) {
-            if (this.grid.wrapping) {
-                y -= this.grid.height;
-            } else {
-                y = this.grid.height - 1;
-                movementConstrained = true;
-            }
-        }
-        this.x = x;
-        this.y = y;
-
+        let movementConstrained = this.handleBoundaryCollision(xAmount, yAmount)
         this.render();
         if (!movementConstrained) {
             this.grid.render(this.x - xAmount, this.y - yAmount);
@@ -199,17 +181,17 @@ class Avatar {
     renderStatsData(id) {
         let staticAtr = Object.getOwnPropertyNames(this.staticAttributes);
         let staticString = '';
-        for (let i = 0; i < staticAtr.length; i++){
-            staticString += firstWord(staticAtr[i]) + ': ' + this.staticAttributes[staticAtr[i]] + '<br>';
+        for (let i of staticAtr){
+            staticString += firstWord(i) + ': ' + this.staticAttributes[i] + '<br>';
         }
         let dynamicAtr = Object.getOwnPropertyNames(this.dynamicAttributes);
         let dynamicString = '';
-        for (let i = 0; i < dynamicAtr.length; i++){
-            dynamicString += (firstWord(dynamicAtr[i]).match('Carryweight') ? 'Carry Weight' : firstWord(dynamicAtr[i])) + ': ' + this.dynamicAttributes[dynamicAtr[i]].val + ' / ' + this.dynamicAttributes[dynamicAtr[i]].total + '<br>';
+        for (let i of dynamicAtr){
+            dynamicString += (firstWord(i).match('Carryweight') ? 'Carry Weight' : firstWord(i)) + ': ' + this.dynamicAttributes[i].val + ' / ' + this.dynamicAttributes[i].total + '<br>';
         }
         let inventoryString = `<br>${this.name}'s Inventory:`;
-        for (let i = 0; i < this.inventory.length; i++){
-            inventoryString += `<br>${this.inventory[i].id}`;
+        for (let i of this.inventory){
+            inventoryString += `<br>${i.id}`;
         }
         let dataView = document.getElementById(id);
         dataView.innerHTML = `${this.name}'s attributes:<br><br>${staticString}<br>${dynamicString}${inventoryString}`;

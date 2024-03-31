@@ -3,7 +3,16 @@ function firstWord(aString) {
 }
 
 function clamp(val, lo, hi){
-    return val < lo ? lo : (val > hi ? hi : val)
+    let retval = val < lo ? lo : val;
+    retval = retval > hi ? hi : retval;
+    return retval;
+}
+
+function wrap(val, lo, hi){
+    const range = hi - lo;
+    let retval = val < lo ? val + range : lo;
+    retval =  val > hi ? val - range : val;
+    return retval;
 }
 
 /*  convert a float to radians. Ideal for values between -1 and 1. */
@@ -17,26 +26,32 @@ function distr(val, amt, iterations = 5) {
 	let amtCopy = amt;
 	let ratio = valCopy/(amt)
 	if (ratio < 1) {
-		console.log('function distr() failed: argument "val" must be greater than or equal to argument "amt"')
+		throw new Error('function distr() failed: argument "val" must be greater than or equal to argument "amt"');
 	} else {
-		let ret = [];
-		while (ret.length < amt-1) {
-			let toAdd = Math.floor(Math.floor(Math.random() * ratio)+ratio/2);
+		let distributed = [];
+		while (distributed.length < amt-1) {
+			let toAdd = Math.floor(Math.floor(Math.random() * ratio) + ratio / 2);
 			valCopy -= toAdd;
-			ret.push(toAdd)
+			distributed.push(toAdd)
 			amtCopy--;
 			ratio = valCopy / amtCopy;
 		}
 		if (valCopy > 0) {
-			ret.push(valCopy)
+			distributed.push(valCopy)
         }
         for (let i = 0; i < iterations; i++){
-            let hi = Math.max(...ret);
-            let lo = Math.min(...ret);
+            let hi = Math.max(...distributed);
+            let lo = Math.min(...distributed);
             if (hi - 1 > 0){
                 hi -= 1;
                 lo += 1;
             }
+        }
+        let ret = [];
+        let index;
+        while (distributed.length > 0){
+            index = Math.floor(Math.random() * distributed.length)
+            ret.push(distributed.splice(index, 1));
         }
 		return ret;
 	}

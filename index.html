@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html>
+<html lang="eng">
     <head>
         <meta charset="utf-8">
         <title>Incremental Terraformer</title>
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.1.9/p5.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.2/p5.min.js"></script>
         <script src="utilities.js"></script>
         <script src="terrains.js"></script>
         <script src="materials.js"></script>
@@ -16,13 +16,15 @@
     </head>
     <body>
     <div id="appcontainer">
-        <div id="playerdata" class="info"></div>
-        <div id="currentcell" class="info"></div>
-        <div id="cellbuttons" class="info">
+        <h1 id="headingbanner" class="grid-item">Incremental Terraformer</h1>
+        <div id="playerdata" class="info grid-item"></div>
+        <div id="currentcell" class="info grid-item"></div>
+        <div id="cellbuttons" class="info grid-item">
             <select id="toHarvest" hidden=true></select>
         </div>
-        <div id="playerbuttons" class="info"></div>
-        <div id="uilog" class="info"></div>
+        <canvas id="zoomlayer" width=216 height=216 class="grid-item"></canvas>
+        <div id="playerbuttons" class="info grid-item"></div>
+        <div id="uilog" class="info grid-item"></div>
         <script src="incremental_terraformer.js"></script>
     </div>
     </body>

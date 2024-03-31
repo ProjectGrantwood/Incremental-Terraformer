@@ -1,55 +1,108 @@
 html {
-    background-color: black;
+    background-color: #0A0F0D; /* Deep greenish-black, like a dense forest at night */
 }
 
 body {
-    background-color: black;
-    color: white;
-    font-family: monospace;
+    background-color: #0A0F0D;
+    color: #E4E8B6; /* Soft, yellowish-white, resembling aged parchment */
+    font-family: 'Courier New', monospace; /* More refined monospace choice for pixelated aesthetics */
+    font-size: 14px;
 }
 
 #appcontainer {
     display: grid;
-    grid-template-rows: 1fr auto auto;
+    grid-template-rows: 120px auto auto auto auto;
     grid-template-columns: 1fr auto 1fr;
-    grid-template-areas: "c1 m1 p1"
-                         "c2 m1 p2"
-                         "l1 l1 l1";
+    grid-template-areas: 
+        "h1 h1 h1"
+        "c1 m1 zl"
+        "p2 m1 p1"
+        "p2 m1 c2"
+        "l1 l1 l1";
     gap: 4px;
+    color: #F4F4F4; /* Lighter text for better contrast */
+}
+
+.grid-item {
+    justify-self: center;
+    align-self: center;
 }
 
 .info {
-    margin: 0px;
+    margin: 0;
     padding: 16px;
 }
 
+.harvestable {
+    background-color: #06352A; /* Dark green, like dense foliage, consistent with the game's theme */
+    box-shadow: 0 0 10px #06352A; /* Soft green glow to indicate interactivity */
+    border: 1px solid #E4E8B6; /* Border color resembling aged parchment for consistency */
+    border-radius: 5px; /* Softened edges for a more polished look */
+    padding: 2px; /* Increased padding for better readability and visual balance */
+    margin: 2px; /* Slightly increased margin for better separation from surrounding elements */
+    width: fit-content; /* Ensures the width adjusts to the content, with minimum width for better UI */
+    cursor: pointer; /* Indicates the element is clickable */
+    transition: transform 0.05s ease, box-shadow 0.2s ease; /* Smooth transition for interactive feedback */
+    color: #E4E8B6; /* Text color matching the border for consistency */
+}
+
+.harvestable:hover, .harvestable:focus {
+    transform: scale(1.025); /* Slightly enlarges the element to indicate it's actionable */
+    box-shadow: 0 0 12px #094e3e; /* Soft green glow to indicate interactivity */
+}
+
+#headingbanner {
+    text-align: center;
+    font-size: 48px;
+    text-shadow: 2px 2px 4px #06352A; /* Dark green shadow for depth, matching the wilderness theme */
+    border: 2px solid #E4E8B6; /* Border color resembling aged parchment */
+    border-radius: 10px;
+    box-shadow: 0 0 10px #E4E8B6; /* Soft glow effect to match the aged parchment color */
+    grid-area: h1;
+    background-color: #1A4731; /* Dark green, like the canopy of a dense forest */
+    color: #E4E8B6; /* Text color matching the border and shadow */
+    margin: 5px;
+    padding: 5px;
+}
+
+#zoomlayer {
+    margin: 0;
+    padding: 0;
+    grid-area: zl;
+}
+
 #defaultCanvas0 {
-    margin: 0px;
-    padding: 0px;
+    margin: 0;
+    padding: 0;
     grid-area: m1;
 }
 
 #currentcell {
-    background-color: #03875b;
+    background-color: #327A5E; /* Soft, dark teal for a water or foliage element */
     grid-area: c1;
+    color: #E4E8B6;
 }
 
 #playerdata {
-    background-color: #5587b1;
+    background-color: #6D9886; /* Muted green, like moss or leaves */
     grid-area: p1;
+    color: #0A0F0D;
 }
 
 #cellbuttons {
-    background-color: #0387b1;
+    background-color: #507C70; /* Darker shade of teal for interface elements */
     grid-area: c2;
+    color: #E4E8B6;
 }
 
 #playerbuttons {
-    background-color: #746374;
+    background-color: #8A9A5B; /* Olive green, suggesting survival or utility */
     grid-area: p2;
+    color: #0A0F0D;
 }
 
 #uilog {
-    background-color: black;
+    background-color: #0A0F0D; /* Matching the overall theme's base color */
     grid-area: l1;
+    color: #E4E8B6;
 }

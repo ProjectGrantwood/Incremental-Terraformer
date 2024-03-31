@@ -18,7 +18,7 @@ class Grid {
             for (let y = 0; y < aGrid.height; y++) {
                 let n0 = x / 100;
                 let n1 = y / 100;
-                let n2 = noise(n0 / 2, n1 / 2) * (aGrid.width / 200 + aGrid.height / 200) / 4;
+                let n2 = noise(n0 / 2, n1 / 2) * (aGrid.width / 150 + aGrid.height / 150) / 4;
                 let jitteredNoise = 0.5 - noiseJitter + noise(n0, n1, Math.random()) * noiseJitter;
                 let smoothedNoiseWithJitter = (0.5 + jitteredNoise) / 2;
                 let n = smoothedNoiseWithJitter + smoothedNoiseWithJitter * fsin(noise(n0, n1, n2) ** (n2 * 4));
@@ -148,7 +148,7 @@ class Grid {
                 if (materialString.endsWith('water')) {
                     materialString = materialString.replace(/water/, ' water');
                 }
-                materialList += '<br>' + firstWord(materialString) + ': ' + c.materialData.materials[m].amount;
+                materialList += `<div class="harvestable"> ${firstWord(materialString)}: ${c.materialData.materials[m].amount}</div>`;
             }
         }
         let dataView = document.getElementById(id);
@@ -164,9 +164,6 @@ class Grid {
                 selectMaterialString += `<select name="toHarvest" id="toHarvest">Harvest Material:`
                 for (let m of Object.getOwnPropertyNames(c.materialData.materials)) {
                     let mString = c.materialData.materials[m].id;
-                    // if (mString.endsWith('water')) {
-                        // mString = mString.replace(/water/, ' water');
-                    // }
                     selectMaterialString += `<option value=${mString}>${mString}</option>`
                 }
                 selectMaterialString += `</select>`;
@@ -176,6 +173,30 @@ class Grid {
                 let buttonString = `<button onclick="eugene.pickUp('${materialSelect.value}')">Harvest ${materialSelect.value}</button>`;
                 buttons.innerHTML += buttonString;
                 
+        }
+    }
+    
+    getSubsection(x, y, size = zoomRadius) {
+        const halfSize = Math.floor(size / 2)
+        let subsection = [];
+        for (let i = x - halfSize; i < x + halfSize + 1; i++) {
+            subsection.push([]);
+            
+            for (let j = y - halfSize; j < y + halfSize + 1; j++) {
+                subsection[subsection.length - 1].push(this.wrap(i, j));
+            }
+        }
+        return subsection;
+    }
+    
+    renderSubsection(zoomLayer, x, y, size = zoomRadius){
+        let subsection = this.getSubsection(x, y, size);
+        for (let x = 0; x < subsection.length; x++){
+            for (let y = 0; y < subsection[x].length; y++){
+                let c = subsection[x][y]
+                zoomLayer.fill(c.displayData.color);
+                zoomLayer.rect(x * zoomedCellSize, y * zoomedCellSize, zoomedCellSize);
+            }
         }
     }
 
