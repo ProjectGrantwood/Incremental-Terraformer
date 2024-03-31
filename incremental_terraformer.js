@@ -56,5 +56,5 @@ function arrowKeyMovementHandler(e){
                 UILOG.inform("Eugene waits for a tick.");
                 break;
         }
-        preventDefault();
+        return false;
     }

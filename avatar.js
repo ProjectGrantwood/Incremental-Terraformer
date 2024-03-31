@@ -7,7 +7,7 @@ class Avatar {
         this.grid = grid;
         this.size = this.grid.size - 1;
         this.fillStyle = 'orange';
-        this.inventory = [];
+        this.inventory = {};
         this.staticAttributes = {
             strength: 1,
             litheness: 1,
@@ -96,28 +96,45 @@ class Avatar {
         let c = this.grid.find(this.x, this.y);
         let item = c.materialData.materials[itemId];
         if (this.dynamicAttributes.carryweight.val + item.unitmass > this.dynamicAttributes.carryweight.total) {
-            uilog.warn('You cannot pick up this item: you are carrying too much!')
+            UILOG.warn(`${this.name} cannot pick up ${itemId}: they are carrying too much!`)
         } else {
-            this.inventory.push(Object.create(item));
+            if (this.inventory[itemId] === undefined){
+                this.inventory[itemId] = {item: Object.create(item), amount: 1, elementCreated: false};
+            } else {
+                this.inventory[itemId].amount += 1;
+            }
             this.calcCarriedWeight();
             this.grid.decrementMaterialAmount(c, itemId);
             if (JSON.stringify(c.materialData.materials) === '{}'){
                 c.materialData.materialsSpawned = false;
             }
             this.grid.renderCellData(this.x, this.y, 'currentcell', this.name)
-            this.grid.renderCellButtons(this.x, this.y, this);
         }
+    }
+    
+    drop(itemId){
+        let c = this.grid.find(this.x, this.y);
+        let item = c.materialData.materials[itemId];
+        if (this.inventory[itemId].amount > 1){
+            this.inventory[itemId].amount -= 1;
+        } else {
+            delete this.inventory[itemId];
+        }
+        this.calcCarriedWeight();
+        this.grid.incrementMaterialAmount(c, itemId);
+        this.grid.renderCellData(this.x, this.y, 'currentcell', this.name)
+        UILOG.inform(`${this.name} drops ${itemId}.`)
     }
 
     calcCarriedWeight(){
-        if (this.inventory.length === 0) {
+        if (Object.keys(this.inventory).length === 0) {
             this.dynamicAttributes.carryweight.val = 0;
         } else {
             let sum = 0;
-            for (let i of this.inventory){
-                sum += i.unitmass;
+            for (let i of Object.keys(this.inventory)){
+                sum += this.inventory[i].item.unitmass * this.inventory[i].amount
             }
-            this.dynamicAttributes.carryweight.val = sum;
+            this.dynamicAttributes.carryweight.val = Math.round(sum * 100) / 100;
         }
     }
 
@@ -164,7 +181,6 @@ class Avatar {
             this.grid.spawnMaterials(this.x, this.y);
             this.grid.renderCellData(this.x, this.y, 'currentcell', this.name);
             this.grid.render(this.x, this.y);
-            this.grid.renderCellButtons(this.x, this.y, this);
             return this.render();
         }
         let movementConstrained = this.handleBoundaryCollision(xAmount, yAmount)
@@ -172,10 +188,8 @@ class Avatar {
         if (!movementConstrained) {
             this.grid.render(this.x - xAmount, this.y - yAmount);
             this.grid.spawnMaterials(this.x, this.y);
-            this.grid.renderCellButtons(this.x, this.y, this);
         }
         this.grid.renderCellData(this.x, this.y, 'currentcell', this.name)
-        this.grid.renderCellButtons(this.x, this.y, this);
     }
 
     renderStatsData(id) {
@@ -189,12 +203,20 @@ class Avatar {
         for (let i of dynamicAtr){
             dynamicString += (firstWord(i).match('Carryweight') ? 'Carry Weight' : firstWord(i)) + ': ' + this.dynamicAttributes[i].val + ' / ' + this.dynamicAttributes[i].total + '<br>';
         }
-        let inventoryString = `<br>${this.name}'s Inventory:`;
-        for (let i of this.inventory){
-            inventoryString += `<br>${i.id}`;
+        
+        for (let i of Object.keys(this.inventory)){
+            let item = this.inventory[i];
+            if (item.elementCreated){
+                const itemElement = document.getElementById(`${item.item.id}-inventory`);
+                itemElement.innerHTML = `${item.item.id} x${item.amount}`
+            } else {
+                const invElement = document.getElementById("playerinventory");
+                invElement.innerHTML += `<div id="${item.item.id}-inventory" class="inventory-item">${item.item.id} x${item.amount}</div>`;
+                item.elementCreated = true;
+            }
         }
         let dataView = document.getElementById(id);
-        dataView.innerHTML = `${this.name}'s attributes:<br><br>${staticString}<br>${dynamicString}${inventoryString}`;
+        dataView.innerHTML = `${this.name}'s attributes:<br><br>${staticString}<br>${dynamicString}`;
     }
 
 }

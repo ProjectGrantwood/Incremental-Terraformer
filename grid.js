@@ -148,32 +148,11 @@ class Grid {
                 if (materialString.endsWith('water')) {
                     materialString = materialString.replace(/water/, ' water');
                 }
-                materialList += `<div class="harvestable"> ${firstWord(materialString)}: ${c.materialData.materials[m].amount}</div>`;
+                materialList += `<div class="harvestable" onclick="eugene.pickUp('${c.materialData.materials[m].id}')"> ${firstWord(materialString)}: ${c.materialData.materials[m].amount}</div>`;
             }
         }
         let dataView = document.getElementById(id);
         dataView.innerHTML = c.physicalData.toRender + '<br><br>' + playerName + c.tileDescription + '<br>' + materialList;
-    }
-
-    renderCellButtons(x, y, avatar) {
-            let c = this.find(x, y);
-            let buttons = document.getElementById('cellbuttons');
-            buttons.innerHTML = '';
-            let selectMaterialString = '';
-            if (c.materialData.materialsSpawned === true) {
-                selectMaterialString += `<select name="toHarvest" id="toHarvest">Harvest Material:`
-                for (let m of Object.getOwnPropertyNames(c.materialData.materials)) {
-                    let mString = c.materialData.materials[m].id;
-                    selectMaterialString += `<option value=${mString}>${mString}</option>`
-                }
-                selectMaterialString += `</select>`;
-                buttons.innerHTML += selectMaterialString;
-                let materialSelect = document.getElementById('toHarvest');
-                
-                let buttonString = `<button onclick="eugene.pickUp('${materialSelect.value}')">Harvest ${materialSelect.value}</button>`;
-                buttons.innerHTML += buttonString;
-                
-        }
     }
     
     getSubsection(x, y, size = zoomRadius) {
